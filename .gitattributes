@@ -1,0 +1,8 @@
+# .gitattributes
+
+# This file is used to define attributes per path.
+* text=auto eol=lf
+
+# Set default behavior to automatically normalize line endings
+# *.bat text eol=crlf
+# *.cmd text eol=crlf
