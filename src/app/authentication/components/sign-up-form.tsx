@@ -18,8 +18,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 const formSchema = z
@@ -30,13 +33,14 @@ const formSchema = z
     confirmPassword: z.string().min(8, "Senha inválida."),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    error: "As senhas não coincidem.",
+    message: "As senhas não coincidem.",
     path: ["confirmPassword"],
   });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const SignUpForm = () => {
+  const router = useRouter();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,9 +51,33 @@ const SignUpForm = () => {
     },
   });
 
-  function onSubmit(values: FormValues) {
-    console.log("Form submitted with values:");
-    console.log(values);
+  async function onSubmit(values: FormValues) {
+    const { data } = await authClient.signUp.email({
+      name: values.name, // required
+      email: values.email, // required
+      password: values.password, // required
+      fetchOptions: {
+        onSuccess: (data) => {
+          console.log("Sign up successful with data:", data);
+          router.push("/");
+        },
+        onError: (ctx) => {
+          console.error("Error during sign up:", ctx);
+
+          if (ctx.error.code === "INVALID_EMAIL_OR_PASSWORD") {
+            toast.error("Credenciais inválidas.");
+            return;
+          }
+
+          if (ctx.error.code === "USER_ALREADY_EXISTS") {
+            toast.error("Email já cadastrado.");
+            return form.setError("email", { message: "Email já cadastrado." });
+          }
+
+          toast.error(ctx.error.message || "Erro ao criar conta.");
+        },
+      },
+    });
   }
 
   return (
