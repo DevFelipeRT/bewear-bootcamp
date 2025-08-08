@@ -1,3 +1,4 @@
+import CategorySelector from "@/components/common/category-selector";
 import Header from "@/components/common/header";
 import ProductList from "@/components/common/products-list";
 import { db } from "@/db";
@@ -9,6 +10,9 @@ const Home = async () => {
       variants: true,
     },
   });
+
+  const categories = await db.query.categoryTable.findMany();
+  
   return (
     <>
       <Header />
@@ -25,6 +29,10 @@ const Home = async () => {
         </div>
 
         <ProductList products={products} title="Mais vendidos" />
+
+        <div className="px-5">
+          <CategorySelector categories={categories} />
+        </div>
 
         <div className="px-5">
           <Image
