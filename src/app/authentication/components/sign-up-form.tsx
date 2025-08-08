@@ -69,6 +69,11 @@ const SignUpForm = () => {
             return;
           }
 
+          if (ctx.error.code === "INVALID_ORIGIN") {
+            toast.error("Credenciais inválidas.");
+            return;
+          }
+
           if (ctx.error.code === "USER_ALREADY_EXISTS") {
             toast.error("Email já cadastrado.");
             return form.setError("email", { message: "Email já cadastrado." });
