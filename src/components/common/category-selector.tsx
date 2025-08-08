@@ -1,5 +1,6 @@
 import { categoryTable } from "@/db/schema";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface CategorySelectorProps {
   categories: (typeof categoryTable.$inferSelect)[];
@@ -11,7 +12,7 @@ const CategorySelector = ({ categories }: CategorySelectorProps) => {
       <div className="grid grid-cols-2 gap-3">
         {categories.map((category) => (
           <Button key={category.id} variant="ghost" className="bg-white rounded-full text-xs font-semibold">
-            {category.name}
+            <Link href={`/category/${category.slug}`}>{category.name}</Link>
           </Button>
         ))}
       </div>
