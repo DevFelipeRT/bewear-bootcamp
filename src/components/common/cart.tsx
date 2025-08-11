@@ -13,6 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getCart } from "@/actions/get-cart";
 import Image from "next/image";
+import CartItem from "./cart-item";
 
 const Cart = () => {
   const { data: cart, isLoading } = useQuery({
@@ -32,31 +33,20 @@ const Cart = () => {
           <SheetTitle>Carrinho</SheetTitle>
         </SheetHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-4 px-5">
           {isLoading ? (
             <p>Carregando...</p>
           ) : cart?.items && cart.items.length > 0 ? (
             cart.items.map((item) => (
-              <div
+              <CartItem
                 key={item.id}
-                className="flex items-center space-x-4 rounded border p-4"
-              >
-                <Image
-                  src={item.productVariant.imageUrl}
-                  alt={item.productVariant.name}
-                  width={80}
-                  height={80}
-                  className="rounded"
-                />
-                <div className="flex-1">
-                  <h3 className="font-medium">
-                    {item.productVariant.product.name}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {item.productVariant.name}
-                  </p>
-                </div>
-              </div>
+                id={item.id}
+                productName={item.productVariant.product.name}
+                productVariantName={item.productVariant.name}
+                productVariantImageUrl={item.productVariant.imageUrl}
+                productVariantPriceInCents={item.productVariant.priceInCents}
+                quantity={item.quantity}
+              />
             ))
           ) : (
             <p className="text-center text-gray-500">Seu carrinho está vazio</p>
