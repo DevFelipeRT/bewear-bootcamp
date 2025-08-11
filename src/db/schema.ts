@@ -7,6 +7,7 @@ import {
   uuid,
   boolean,
 } from "drizzle-orm/pg-core";
+import { Phone } from "lucide-react";
 
 export const userTable = pgTable("user", {
   id: text("id").primaryKey(),
@@ -23,6 +24,12 @@ export const userTable = pgTable("user", {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const userRelations = relations(userTable, ({ many }) => ({
+  sessions: many(sessionTable),
+  accounts: many(accountTable),
+  shippingAddresses: many(shippingAddressTable),
+}));
 
 export const sessionTable = pgTable("session", {
   id: text("id").primaryKey(),
@@ -117,6 +124,36 @@ export const productVariantRelations = relations(
     product: one(productTable, {
       fields: [productVariantTable.productId],
       references: [productTable.id],
+    }),
+  }),
+);
+
+export const shippingAddressTable = pgTable("shipping_address", {
+  id: uuid().primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id, { onDelete: "cascade" }),
+  email: text().notNull(),
+  recipientName: text().notNull(),
+  cpfOrCnpj: text().notNull(),
+  phone: text().notNull(),
+  street: text().notNull(),
+  number: text().notNull(),
+  complement: text(),
+  neighborhood: text().notNull(),
+  city: text().notNull(),
+  state: text().notNull(),
+  country: text().notNull(),
+  zipCode: text().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const shippingAddressRelations = relations(
+  shippingAddressTable,
+  ({ one }) => ({
+    user: one(userTable, {
+      fields: [shippingAddressTable.userId],
+      references: [userTable.id],
     }),
   }),
 );
